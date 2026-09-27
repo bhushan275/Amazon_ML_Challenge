@@ -1,3 +1,38 @@
-from .candidate_generator import MultiPassBlocker, compute_blocking_metrics
+"""
+src.blocking package (Person 2 - Candidate Generation & Blocking Lead)
+"""
 
-__all__ = ['MultiPassBlocker', 'compute_blocking_metrics']
+from .blocking import (
+    generate_soundex_key,
+    generate_metaphone_key,
+    CountryAwareBlocker,
+    SortedNeighborhoodBlocker,
+    MinHashLSHBlocker,
+    TfidfCosineBlocker,
+    MultiPassBlocker,
+    compute_blocking_metrics
+)
+
+from .candidate_gen import (
+    load_source_tsv,
+    load_ground_truth,
+    write_candidate_pairs_tsv,
+    generate_mock_normalized_data,
+    evaluate_blocking_on_split
+)
+
+__all__ = [
+    "generate_soundex_key",
+    "generate_metaphone_key",
+    "CountryAwareBlocker",
+    "SortedNeighborhoodBlocker",
+    "MinHashLSHBlocker",
+    "TfidfCosineBlocker",
+    "MultiPassBlocker",
+    "compute_blocking_metrics",
+    "load_source_tsv",
+    "load_ground_truth",
+    "write_candidate_pairs_tsv",
+    "generate_mock_normalized_data",
+    "evaluate_blocking_on_split"
+]

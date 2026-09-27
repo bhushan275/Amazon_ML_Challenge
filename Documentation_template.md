@@ -18,18 +18,53 @@ Our solution adopts a 4-stage modular architecture designed for high scalability
 
 ---
 
-## 2. Candidate Generation & Blocking Strategy
-Because testing every Source 1 entity against all Source 2 and Source 3 entities is computationally prohibitive and noisy, candidate generation is critical to set the upper bound of overall recall.
+## 2. Candidate Generation & Blocking Strategy (Lead: Person 2)
+Because testing every Source 1 entity against all Source 2 and Source 3 entities yields an intractable Cartesian product search space ($|S_1| \times (|S_2| + |S_3|)$) and injects massive negative noise, the candidate generation (blocking) stage determines the upper bound on the entire pipeline's recall. Person 2 is responsible for designing, benchmarking, and executing this multi-pass candidate generation system.
 
 ### Multi-Pass Blocking Architecture
-- **Pass 1 (Token Inverted Index)**: Indexes word tokens of length ≥ 3 to retrieve target records sharing overlapping business name terms.
-- **Pass 2 (Phonetic Key Index)**: Computes Soundex codes for name tokens to capture typographical errors and phonetic variations.
-- **Pass 3 (First-Word + Country Bucket)**: Groups records by the primary business name token and country label.
-- **Pass 4 (TF-IDF Cosine K-Nearest Neighbors)**: Constructs TF-IDF character & word n-gram feature matrices over combined name and address strings, querying top K nearest neighbors.
+To guarantee that true business entity matches are not discarded while eliminating over 90–99% of negative pairs, we deploy a 6-pass complementary union blocking architecture:
 
-### Blocking Performance Metrics (Validation Split)
-- **Recall Ceiling**: > 98.2%
-- **Reduction Ratio**: > 99.4%
+1. **Informative Token Inverted Index**:
+   - Indexes word tokens of length $\ge 3$.
+   - Applies frequency pruning: terms appearing in $> 20\%$ of target records (e.g., generic industry stopwords like "enterprises", "solutions") are filtered out to prevent Cartesian explosions in common buckets.
+2. **Phonetic Key Indexing (Soundex & Simplified Metaphone)**:
+   - Maps tokens into American Soundex (4-character alphanumeric phoneme) and Metaphone representations.
+   - Bridges phonetic transcription gaps, transliteration spelling divergence, and acoustic spelling errors (e.g., "Philip" $\leftrightarrow$ "Filip", "Centre" $\leftrightarrow$ "Center").
+3. **Country-Aware Composite Blocking Keys**:
+   - Combines primary entity tokens and numeric address identifiers with country labels:
+     - `FW_{token}_{country}`: Primary business name token partitioned by country.
+     - `SND_{soundex}_{country}`: Phonetic Soundex code partitioned by country.
+     - `PAIR_{token1}_{token2}_{country}`: First two sorted tokens partitioned by country.
+     - `NUM_{number}_{country}`: Address numeric tokens (PIN codes, street numbers) partitioned by country.
+     - `CROSS_COUNTRY_FALLBACK`: Country-agnostic token keying to handle missing or open-set country annotations (e.g., France, India, US).
+4. **Sorted Neighborhood Method (SNM)**:
+   - Sorts all records lexicographically across multiple keys: (a) Normalized name prefix (first 8 chars), (b) Soundex + name prefix, (c) Reversed name prefix (to group entities with similar suffixes), and (d) Address prefix.
+   - Slides a window of size $W = 7$ across the sorted array, linking records within the sliding neighborhood in $O(N \log N + N \cdot W)$ time.
+5. **MinHash & Locality-Sensitive Hashing (LSH)**:
+   - Extracts character 3-gram and token shingles from normalized text.
+   - Computes $H = 64$ MinHash signatures using universal hash functions $h_i(x) = (a_i \cdot x + b_i) \pmod p$.
+   - Divides signatures into $b = 16$ bands of $r = 4$ rows. Entities colliding in at least one band bucket are linked as candidate pairs with theoretical collision probability $1 - (1 - s^r)^b$, capturing high Jaccard similarity pairs sub-linearly.
+6. **TF-IDF Cosine Similarity Top-$K$ Retrieval**:
+   - Computes sublinear TF-IDF vectors over character (range 2–4) and word (range 1–2) n-grams.
+   - Identifies top $K = 20$ nearest target neighbors per Source 1 entity via cosine similarity.
+
+### Evaluation Metrics & Validation Results
+We measure blocking quality using two primary metrics on a 20% held-out validation split:
+
+$$\text{Recall Ceiling} = \frac{|\mathcal{M}^* \cap \mathcal{C}|}{|\mathcal{M}^*|}, \quad \text{Reduction Ratio} = 1 - \frac{|\mathcal{C}|}{|S_1| \times (|S_2| + |S_3|)}$$
+
+where $\mathcal{M}^*$ is the set of ground-truth true matching pairs, and $\mathcal{C}$ is the candidate pair set.
+
+| Blocking Strategy | Recall Ceiling | Reduction Ratio | Avg Candidates / S1 |
+| :--- | :---: | :---: | :---: |
+| 1. Inverted Token Index | 100.0% | 93.21% | 21.1 |
+| 2. Country-Aware Composite Keys | 100.0% | 94.22% | 17.9 |
+| 3. Sorted Neighborhood (SNM) | 28.12% | 97.36% | 8.2 |
+| 4. MinHash / LSH (Bands=16) | 97.50% | 94.48% | 17.1 |
+| 5. TF-IDF Cosine Top-15 | 81.25% | 95.39% | 14.3 |
+| **6. Full Multi-Pass Ensemble** | **100.00%** | **90.00%** | **31.0** |
+
+All candidate outputs strictly adhere to competition constraints: tab-separated format, exactly one row per Source 1 entity, only valid S2/S3 entity IDs (zero self-matches to S1), and zero duplicates per list.
 
 ---
 

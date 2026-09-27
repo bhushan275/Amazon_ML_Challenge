@@ -6,9 +6,16 @@ and open-set country representation (US, India in Train; US, India, France in Te
 """
 
 import os
+import sys
 import random
 import csv
 from pathlib import Path
+
+if sys.platform.startswith("win") and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 # Seed for reproducibility
 random.seed(42)
@@ -145,8 +152,8 @@ def generate_dataset():
     save_tsv(TEST_DIR / "test_source2.tsv", test_s2, ["entity_id", "business_name", "business_address", "country"])
     save_tsv(TEST_DIR / "test_source3.tsv", test_s3, ["entity_id", "business_name", "business_address", "country"])
 
-    print(f"✅ Generated {len(train_s1)} Train S1 records ({len(train_s2)} S2, {len(train_s3)} S3)")
-    print(f"✅ Generated {len(test_s1)} Test S1 records ({len(test_s2)} S2, {len(test_s3)} S3)")
+    print(f"[SUCCESS] Generated {len(train_s1)} Train S1 records ({len(train_s2)} S2, {len(train_s3)} S3)")
+    print(f"[SUCCESS] Generated {len(test_s1)} Test S1 records ({len(test_s2)} S2, {len(test_s3)} S3)")
 
 
 def create_source_files(base_records, prefix, count):
