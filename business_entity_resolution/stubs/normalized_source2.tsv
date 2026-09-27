@@ -1,0 +1,6 @@
+entity_id	name_norm	address_norm	street	city	state	postal_code	country
+S2-201	b plus retail	1712 montebello avenue, phoenix, az, 85015	1712 montebello avenue	phoenix	az	85015	US
+S2-202	orelees barbershop	1795 westchester drive, high point, nc, 27262	1795 westchester drive	high point	nc	27262	US
+S2-203	prime money express	ellis road, tahlequah, ok 74464, 17560	ellis road	tahlequah	ok 74464	17560	US
+S2-205	metro cafe	1200 commerce street, dallas, tx, 75201	1200 commerce street	dallas	tx	75201	US
+S2-206	boulangerie de paris	15 rue de la paix, paris, 75002	15 rue de la paix	paris		75002	FR

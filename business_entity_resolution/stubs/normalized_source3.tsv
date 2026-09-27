@@ -1,0 +1,5 @@
+entity_id	name_norm	address_norm	street	city	state	postal_code	country
+S3-301	b retail	1712 montebello avenue, phoenix, arizona, 85015	1712 montebello avenue	phoenix	arizona	85015	US
+S3-302	orelee barber shop	1795 westchester drive, high point, nc	1795 westchester drive	high point	nc		US
+S3-303	prime money exchange	ellis road, tahlequah, ok, 17560	ellis road	tahlequah	ok	17560	US
+S3-306	la boulangerie de paris s a r l	15 rue de la paix, paris, 75002	15 rue de la paix	paris		75002	FR

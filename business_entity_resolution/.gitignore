@@ -1,0 +1,24 @@
+# Dataset and Output directories (ignored from git tracking)
+dataset/
+output/
+
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Bytecode and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# IDE & OS Specific Files
+.vscode/
+.idea/
+.DS_Store
+*.swp

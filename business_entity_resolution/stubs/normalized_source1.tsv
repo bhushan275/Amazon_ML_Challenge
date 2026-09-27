@@ -1,0 +1,7 @@
+entity_id	name_norm	address_norm	street	city	state	postal_code	country
+S1-101	b retail	1712 montebello avenue, phoenix, az, 85015	1712 montebello avenue	phoenix	az	85015	US
+S1-102	orelee s barbershop	1795 westchester drive, high point, nc, 27262	1795 westchester drive	high point	nc	27262	US
+S1-103	prime money transfers	ellis road, tahlequah, ok 74464, 17560	ellis road	tahlequah	ok 74464	17560	US
+S1-104	unique local bakery	797 lake town block a, kolkata, 700089	797 lake town block a	kolkata		700089	IN
+S1-105	metro cafe	500 main street, phoenix, az, 85001	500 main street	phoenix	az	85001	US
+S1-106	boulangerie de paris	15 rue de la paix, paris, 75002	15 rue de la paix	paris		75002	FR
